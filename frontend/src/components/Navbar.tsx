@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const Navbar: React.FC = () => {
   return (
@@ -29,18 +30,18 @@ export const Navbar: React.FC = () => {
         </nav>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
+          <Link
+            to="/login"
             className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
           >
             Sign In
-          </button>
-          <button
-            type="button"
+          </Link>
+          <Link
+            to="/login"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors"
           >
             Get Started
-          </button>
+          </Link>
         </div>
       </div>
     </header>
