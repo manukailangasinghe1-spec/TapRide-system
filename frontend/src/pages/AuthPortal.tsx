@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Bus, QrCode, Wallet, Smartphone, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import ActionModal from '../components/ActionModal';
 
@@ -8,7 +8,8 @@ type Role = 'passenger' | 'conductor' | 'operator';
 
 export default function AuthPortal() {
  const navigate = useNavigate();
- const [authMode, setAuthMode] = useState<AuthMode>('login');
+ const location = useLocation();
+ const [authMode, setAuthMode] = useState<AuthMode>(location.pathname === '/register' ? 'register' : 'login');
  const [activeRole, setActiveRole] = useState<Role>('passenger');
  
  // State for forms
