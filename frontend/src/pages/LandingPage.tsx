@@ -7,7 +7,6 @@ import {
   BusFront,
   Check,
   CircleHelp,
-  CreditCard,
   Menu,
   QrCode,
   RefreshCw,
@@ -20,9 +19,6 @@ import {
   BarChart3,
   ReceiptText,
   Database,
-  Mail,
-  Code2,
-  Server,
   ScanLine,
   Banknote,
   CarFront,
@@ -147,17 +143,6 @@ const roles = [
     text: 'Routes, fares, users and oversight',
     icon: ShieldCheck,
   },
-]
-
-const technologies = [
-  { icon: Code2, name: 'React + TypeScript PWA' },
-  { icon: Server, name: 'FastAPI (Python)' },
-  { icon: Database, name: 'PostgreSQL' },
-  { icon: CreditCard, name: 'Stripe Sandbox' },
-  { icon: QrCode, name: 'QR Generation & Scanning' },
-  { icon: Database, name: 'IndexedDB Offline Queue' },
-  { icon: Mail, name: 'Brevo Email Receipts' },
-  { icon: Code2, name: 'Docker' },
 ]
 
 function WalletPreview({
@@ -343,22 +328,22 @@ export const LandingPage = () => {
               How it works
             </a>
             <a href="#offline" onClick={closeMenu}>Offline First</a>
-            <a href="#roles" onClick={closeMenu}>About</a>
+            <a href="#about" onClick={closeMenu}>About Us</a>
 
             <div className="mobile-nav-actions">
-              <Link to="/login" onClick={closeMenu}>Login</Link>
+              <Link to="/login" onClick={closeMenu}>Sign In</Link>
               <Link
                 to="/register"
                 className="nav-cta"
                 onClick={closeMenu}
               >
-                Get Started
+                Create Account
               </Link>
             </div>
           </nav>
 
           <div className="header-actions">
-            <Link className="nav-login" to="/login">Login</Link>
+            <Link className="nav-login" to="/login">Sign In</Link>
             <Link className="nav-cta" to="/register">Get Started</Link>
           </div>
 
@@ -568,9 +553,6 @@ export const LandingPage = () => {
                     <b>{title}</b>
                     <small>{detail}</small>
                   </span>
-                  <span className="fallback-number">
-                    0{i + 1}
-                  </span>
                 </div>
               ))}
             </div>
@@ -598,27 +580,52 @@ export const LandingPage = () => {
           </div>
         </section>
 
-        <section
-          className="section technology-section"
-          id="technology"
-        >
-          <div className="section-heading">
-            <span className="eyebrow">TECHNOLOGY</span>
-            <h2>A modern, practical stack</h2>
-            <p>
-              Built with proven technologies for a responsive,
-              resilient transit experience.
-            </p>
-          </div>
+        <section className="section about-section" id="about">
+          <div className="about-inner">
+            <div className="about-copy">
+              <span className="eyebrow">ABOUT TAPRIDE</span>
+              <h2>Making every bus journey smarter.</h2>
+              <p>
+                TapRide is a digital wallet and bus management platform
+                designed to make public transport in Sri Lanka simpler,
+                smarter and more convenient.
+              </p>
+              <p>
+                Our mission is to modernize everyday bus commutes through
+                cashless payments, QR-based ticket validation and
+                automated fare reconciliation, helping passengers and
+                bus operators experience a more efficient journey.
+              </p>
+              <a className="button button-primary" href="#how-it-works">
+                Discover how it works <ArrowRight />
+              </a>
+            </div>
 
-          <div className="technology-grid">
-            {technologies.map(({ icon: Icon, name }) => (
-              <div className="technology-item" key={name}>
-                <Icon />
-                <span>{name}</span>
-                <Check className="tech-check" />
-              </div>
-            ))}
+            <div className="about-highlights">
+              <article className="about-highlight">
+                <span className="feature-icon"><Wallet /></span>
+                <div>
+                  <h3>One digital wallet</h3>
+                  <p>A convenient stored-value wallet for bus journeys.</p>
+                </div>
+              </article>
+
+              <article className="about-highlight">
+                <span className="feature-icon"><QrCode /></span>
+                <div>
+                  <h3>Simple QR ticketing</h3>
+                  <p>Scan to validate your journey with less hassle.</p>
+                </div>
+              </article>
+
+              <article className="about-highlight">
+                <span className="feature-icon"><RefreshCw /></span>
+                <div>
+                  <h3>Fair fare reconciliation</h3>
+                  <p>Calculate the actual fare and release unused holds.</p>
+                </div>
+              </article>
+            </div>
           </div>
         </section>
 
@@ -639,11 +646,11 @@ export const LandingPage = () => {
 
             <div className="cta-buttons">
               <Link className="button button-white" to="/register">
-                Try the Prototype <ArrowRight />
+                Create Account <ArrowRight />
               </Link>
-              <a className="button button-outline" href="#technology">
-                View Documentation <ArrowDownRight />
-              </a>
+              <Link className="button button-outline" to="/login">
+                Sign In <ArrowRight />
+              </Link>
             </div>
           </div>
         </section>
@@ -656,22 +663,29 @@ export const LandingPage = () => {
               <span className="brand-mark">T</span>
               <span>TapRide</span>
             </a>
-            <p>Digital Wallet &amp; Bus Management System</p>
-            <small>
-              Academic Prototype · Group 04 · OUSL · EER4189
-            </small>
+            <p>
+              Smarter, cashless bus journeys across Sri Lanka.
+              One wallet, simple QR ticketing and fair fares.
+            </p>
           </div>
 
-          <div className="footer-links">
+          <div className="footer-column">
+            <h3>Quick Links</h3>
             <a href="#features">Features</a>
-            <a href="#how-it-works">How it works</a>
-            <a href="#technology">Technology</a>
-            <Link to="/login">Login</Link>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#about">About Us</a>
           </div>
 
-          <span className="footer-copyright">
-            © 2026 TapRide · Group 04
-          </span>
+          <div className="footer-column">
+            <h3>User Portals</h3>
+            <Link to="/login">Passenger</Link>
+            <Link to="/login">Conductor</Link>
+            <Link to="/login">Bus Owner</Link>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <span>© 2026 TapRide System · EER4189 OUSL Group 04</span>
         </div>
       </footer>
 
