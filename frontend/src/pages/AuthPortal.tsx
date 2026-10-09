@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Bus, QrCode, Wallet, Smartphone, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { QrCode, Wallet, Smartphone, ShieldCheck } from 'lucide-react';
 import ActionModal from '../components/ActionModal';
 
 type AuthMode = 'login' | 'register' | 'forgot';
@@ -25,8 +25,6 @@ export default function AuthPortal() {
  const [companyName, setCompanyName] = useState('');
  const [brn, setBrn] = useState('');
  const [fleetSize, setFleetSize] = useState('');
- const [primaryRoute, setPrimaryRoute] = useState('');
- const [permitNumber, setPermitNumber] = useState('');
  const [license, setLicense] = useState('');
  const [assignedBus, setAssignedBus] = useState('');
 
