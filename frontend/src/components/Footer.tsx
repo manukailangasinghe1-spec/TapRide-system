@@ -7,15 +7,21 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-base">
-                T
-              </div>
-              <span className="text-xl font-bold text-white tracking-tight">TapRide</span>
+              <img
+                src="/logo.jpeg"
+                alt="TapRide Logo"
+                className="w-8 h-8 object-contain flex-shrink-0"
+              />
+              <span className="text-xl font-bold text-white tracking-tight">
+                TapRide
+              </span>
             </div>
+
             <p className="text-sm text-slate-400 max-w-md leading-relaxed">
               Digital Wallet and Bus Management System for private bus transportation in Sri Lanka.
               Empowering passengers, conductors, and bus operators with contactless ticketing and smart fare reconciliation.
             </p>
+
             <p className="text-xs text-slate-500 mt-3">
               EER4189 – Software Design in Group · The Open University of Sri Lanka (OUSL)
             </p>
