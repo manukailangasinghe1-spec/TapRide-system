@@ -561,7 +561,7 @@ export const LandingPage = () => {
             </div>
 
             <div className="fallback-list">
-              {fallbacks.map(({ title, detail, icon: Icon }, i) => (
+              {fallbacks.map(({ title, detail, icon: Icon }) => (
                 <div className="fallback-row" key={title}>
                   <span className="fallback-icon"><Icon /></span>
                   <span className="fallback-name">
