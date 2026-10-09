@@ -2100,6 +2100,14 @@ svg {
   }
 }
 
+.tapride-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+
 /* Accessibility */
 
 @media (prefers-reduced-motion: reduce) {
