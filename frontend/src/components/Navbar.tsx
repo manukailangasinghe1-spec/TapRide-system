@@ -47,6 +47,9 @@ export const Navbar: React.FC = () => {
           >
             User Roles
           </a>
+          <Link to="/passenger" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+            Passenger Portal
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
