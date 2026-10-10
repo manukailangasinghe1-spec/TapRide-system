@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type {
   PassengerProfile,
   BusRoute,
@@ -22,6 +22,7 @@ import { TopUpModal } from '../components/passenger/TopUpModal';
 import { SendMoneyModal } from '../components/passenger/SendMoneyModal';
 import { HelpModal } from '../components/passenger/HelpModal';
 import { SeasonPassModal } from '../components/passenger/SeasonPassModal';
+import { ToastNotification } from '../components/passenger/ToastNotification';
 import {
   Plus,
   Send,
@@ -44,12 +45,52 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
   const [profile, setProfile] = useState<PassengerProfile>(initialPassengerProfile);
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
-  // Booking state
+  // Automatic Mobile View: default to mobile on < 768px screens
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      return 'mobile';
+    }
+    return 'desktop';
+  });
+  const [hasManuallyToggled, setHasManuallyToggled] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      if (isMobile) {
+        setViewMode('mobile');
+      } else if (!hasManuallyToggled) {
+        setViewMode('desktop');
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [hasManuallyToggled]);
+
+  const handleToggleViewMode = () => {
+    setHasManuallyToggled(true);
+    setViewMode((prev) => (prev === 'desktop' ? 'mobile' : 'desktop'));
+  };
+
+  // Toast notification state
+  const [toast, setToast] = useState<{
+    message: string;
+    type: 'success' | 'error' | 'info' | 'warning';
+  } | null>(null);
+
+  const showToast = (
+    message: string,
+    type: 'success' | 'error' | 'info' | 'warning' = 'info'
+  ) => {
+    setToast({ message, type });
+  };
+
+  // Booking state with dynamic initial date
   const [routes] = useState<BusRoute[]>(sampleRoutes);
   const [selectedRoute, setSelectedRoute] = useState<BusRoute>(sampleRoutes[0]);
-  const [travelDate, setTravelDate] = useState<string>('2026-08-13');
+  const [travelDate, setTravelDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
   const [seats, setSeats] = useState<Seat[]>(() => generateInitialSeats(sampleRoutes[0].baseFare));
 
   // Generated Ticket Pass
@@ -96,9 +137,12 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
 
     const totalFare = selectedSeats.length * selectedRoute.baseFare;
 
-    // Check balance
+    // Check balance (replaced alert with UI toast & modal)
     if (profile.balance < totalFare) {
-      alert(`Insufficient balance! Your current wallet balance is Rs. ${profile.balance.toFixed(2)}, but total ticket fare is Rs. ${totalFare.toFixed(2)}. Please top up your wallet.`);
+      showToast(
+        `Insufficient balance! Your current wallet balance is Rs. ${profile.balance.toFixed(2)}, but total ticket fare is Rs. ${totalFare.toFixed(2)}. Please top up your wallet.`,
+        'error'
+      );
       setIsTopUpModalOpen(true);
       return;
     }
@@ -227,7 +271,7 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
         onTabChange={(tab) => setActiveTab(tab)}
         profile={profile}
         viewMode={viewMode}
-        onToggleViewMode={() => setViewMode(viewMode === 'desktop' ? 'mobile' : 'desktop')}
+        onToggleViewMode={handleToggleViewMode}
         onOpenSeasonPassModal={() => setIsSeasonPassModalOpen(true)}
       />
 
@@ -249,10 +293,18 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
               onOpenSend={() => setIsSendMoneyModalOpen(true)}
               onOpenHelp={() => setIsHelpModalOpen(true)}
               onNavigateToBooking={() => {
-                setViewMode('desktop');
                 setActiveTab('booking');
               }}
               onOpenProfile={() => setIsSeasonPassModalOpen(true)}
+              routes={routes}
+              selectedRoute={selectedRoute}
+              onSelectRoute={handleSelectRoute}
+              travelDate={travelDate}
+              onTravelDateChange={setTravelDate}
+              seats={seats}
+              onToggleSeat={handleToggleSeat}
+              onConfirmBooking={handleConfirmBooking}
+              onShowToast={showToast}
             />
           </div>
         ) : (
@@ -491,6 +543,7 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
         isOpen={isQRPassModalOpen}
         onClose={() => setIsQRPassModalOpen(false)}
         ticket={currentTicket}
+        onShowToast={showToast}
       />
 
       <ScanQRModal
@@ -515,6 +568,7 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
       <HelpModal
         isOpen={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
+        onShowToast={showToast}
       />
 
       <SeasonPassModal
@@ -523,21 +577,30 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
         profile={profile}
         onOpenQR={() => {
           setCurrentTicket({
-            bookingReference: 'PASS-SEASON-2026',
+            bookingReference: `PASS-SEASON-${new Date().getFullYear()}`,
             passengerName: profile.name,
             busName: 'All Provincial Buses',
             busNumber: 'PRIORITY-ALL',
             route: 'All-Island 30-Day Network Pass',
             departureTime: 'Anytime',
-            travelDate: 'Through 2026-08-31',
+            travelDate: `Through ${profile.passExpiry}`,
             seatNumbers: ['A01-A30'],
             totalFare: 0,
             qrPayload: `SEASON_PASS:${profile.name}:PRIORITY_A01_A30`,
-            issuedAt: '2026-08-01',
+            issuedAt: new Date().toISOString().split('T')[0],
           });
           setIsQRPassModalOpen(true);
         }}
       />
+
+      {/* Toast Notification replacing browser alerts */}
+      {toast && (
+        <ToastNotification
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

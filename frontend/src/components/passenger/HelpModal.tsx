@@ -4,9 +4,10 @@ import { X, HelpCircle, Phone, MessageSquare, AlertTriangle, ShieldQuestion, Fil
 interface HelpModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onShowToast?: (message: string, type?: 'success' | 'error' | 'info' | 'warning') => void;
 }
 
-export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
+export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose, onShowToast }) => {
   if (!isOpen) return null;
 
   return (
@@ -47,7 +48,9 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
               href="#faq"
               onClick={(e) => {
                 e.preventDefault();
-                alert('How to Board: Simply show your QR code to the validator near the driver cabin or tap your NFC pass.');
+                if (onShowToast) {
+                  onShowToast('How to Board: Simply show your QR code to the validator near the driver cabin or tap your NFC pass.', 'info');
+                }
               }}
               className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium transition-colors"
             >
@@ -62,7 +65,9 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
               href="#dispute"
               onClick={(e) => {
                 e.preventDefault();
-                alert('Fare Dispute Ticket initiated. Our team will review within 2 hours.');
+                if (onShowToast) {
+                  onShowToast('Fare Dispute Ticket initiated. Our team will review within 2 hours.', 'success');
+                }
               }}
               className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium transition-colors"
             >
@@ -77,7 +82,9 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
               href="#support"
               onClick={(e) => {
                 e.preventDefault();
-                alert('Connecting to TapRide passenger live agent on chat...');
+                if (onShowToast) {
+                  onShowToast('Connecting to TapRide passenger live agent on chat...', 'info');
+                }
                 onClose();
               }}
               className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium transition-colors"

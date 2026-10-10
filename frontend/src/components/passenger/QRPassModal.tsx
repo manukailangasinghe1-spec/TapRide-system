@@ -5,9 +5,15 @@ interface QRPassModalProps {
   isOpen: boolean;
   onClose: () => void;
   ticket: TicketPass | null;
+  onShowToast?: (message: string, type?: 'success' | 'error' | 'info' | 'warning') => void;
 }
 
-export const QRPassModal: React.FC<QRPassModalProps> = ({ isOpen, onClose, ticket }) => {
+export const QRPassModal: React.FC<QRPassModalProps> = ({
+  isOpen,
+  onClose,
+  ticket,
+  onShowToast,
+}) => {
   if (!isOpen || !ticket) return null;
 
   return (
@@ -146,7 +152,11 @@ export const QRPassModal: React.FC<QRPassModalProps> = ({ isOpen, onClose, ticke
           {/* Action Buttons */}
           <div className="mt-5 grid grid-cols-2 gap-3">
             <button
-              onClick={() => alert(`Boarding Pass #${ticket.bookingReference} downloaded as PDF.`)}
+              onClick={() => {
+                if (onShowToast) {
+                  onShowToast(`Boarding Pass #${ticket.bookingReference} downloaded as PDF.`, 'success');
+                }
+              }}
               className="flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-colors"
             >
               <Download className="w-4 h-4" /> Save Pass

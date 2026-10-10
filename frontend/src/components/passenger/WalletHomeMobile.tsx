@@ -13,8 +13,10 @@ import {
   Wallet,
   User,
   Compass,
+  ArrowLeft,
 } from 'lucide-react';
-import type { PassengerProfile, Transaction } from '../../types/passenger';
+import type { PassengerProfile, Transaction, BusRoute, Seat } from '../../types/passenger';
+import { SpotTripBooking } from './SpotTripBooking';
 
 interface WalletHomeMobileProps {
   profile: PassengerProfile;
@@ -23,8 +25,17 @@ interface WalletHomeMobileProps {
   onOpenTopUp: () => void;
   onOpenSend: () => void;
   onOpenHelp: () => void;
-  onNavigateToBooking: () => void;
+  onNavigateToBooking?: () => void;
   onOpenProfile: () => void;
+  routes?: BusRoute[];
+  selectedRoute?: BusRoute;
+  onSelectRoute?: (route: BusRoute) => void;
+  travelDate?: string;
+  onTravelDateChange?: (date: string) => void;
+  seats?: Seat[];
+  onToggleSeat?: (seatId: string) => void;
+  onConfirmBooking?: () => void;
+  onShowToast?: (message: string, type?: 'success' | 'error' | 'info' | 'warning') => void;
 }
 
 export const WalletHomeMobile: React.FC<WalletHomeMobileProps> = ({
@@ -36,6 +47,15 @@ export const WalletHomeMobile: React.FC<WalletHomeMobileProps> = ({
   onOpenHelp,
   onNavigateToBooking,
   onOpenProfile,
+  routes,
+  selectedRoute,
+  onSelectRoute,
+  travelDate,
+  onTravelDateChange,
+  seats,
+  onToggleSeat,
+  onConfirmBooking,
+  onShowToast,
 }) => {
   const [activeBottomNav, setActiveBottomNav] = useState<'home' | 'travel' | 'wallet' | 'profile'>('home');
   const [showAllTransactions, setShowAllTransactions] = useState(false);
@@ -45,29 +65,70 @@ export const WalletHomeMobile: React.FC<WalletHomeMobileProps> = ({
 
   return (
     <div className="max-w-md mx-auto bg-slate-50 min-h-screen shadow-2xl rounded-3xl overflow-hidden border border-slate-200 flex flex-col relative pb-20">
-      {/* 1. Curved Royal Blue Header & Hero */}
-      <div className="relative bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-800 text-white pt-6 pb-24 px-5 rounded-b-[2.5rem] shadow-lg overflow-hidden">
-        {/* Subtle decorative curved circular glow */}
-        <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-blue-400/20 blur-2xl pointer-events-none"></div>
-        <div className="absolute -left-12 top-24 w-40 h-40 rounded-full bg-indigo-500/20 blur-xl pointer-events-none"></div>
-
-        {/* Top Brand & Actions Bar */}
-        <div className="relative flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black text-lg border border-white/20 shadow-xs">
-              T
+      {activeBottomNav === 'travel' && routes && selectedRoute && onSelectRoute && travelDate && onTravelDateChange && seats && onToggleSeat && onConfirmBooking ? (
+        <div className="flex-1 flex flex-col pb-16">
+          {/* Mobile Travel Header */}
+          <div className="bg-gradient-to-r from-blue-700 to-indigo-700 text-white p-4 flex items-center justify-between shadow-md sticky top-0 z-20">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveBottomNav('home')}
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+                title="Back to Wallet Home"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h2 className="text-sm font-extrabold text-white">Spot Trip Booking</h2>
+                <p className="text-[11px] text-blue-100">Reserve bus seat</p>
+              </div>
             </div>
-            <span className="text-xl font-extrabold tracking-tight text-white">TapRide</span>
+            <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-bold text-white uppercase tracking-wider">
+              Mobile Pass
+            </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => alert('No new notifications at this time.')}
-              className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/10 transition-colors"
-              title="Notifications"
-            >
-              <Bell className="w-4 h-4" />
-            </button>
+          <div className="p-3">
+            <SpotTripBooking
+              routes={routes}
+              selectedRoute={selectedRoute}
+              onSelectRoute={onSelectRoute}
+              travelDate={travelDate}
+              onTravelDateChange={onTravelDateChange}
+              seats={seats}
+              onToggleSeat={onToggleSeat}
+              onConfirmBooking={onConfirmBooking}
+            />
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* 1. Curved Royal Blue Header & Hero */}
+          <div className="relative bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-800 text-white pt-6 pb-24 px-5 rounded-b-[2.5rem] shadow-lg overflow-hidden">
+            {/* Subtle decorative curved circular glow */}
+            <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-blue-400/20 blur-2xl pointer-events-none"></div>
+            <div className="absolute -left-12 top-24 w-40 h-40 rounded-full bg-indigo-500/20 blur-xl pointer-events-none"></div>
+
+            {/* Top Brand & Actions Bar */}
+            <div className="relative flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black text-lg border border-white/20 shadow-xs">
+                  T
+                </div>
+                <span className="text-xl font-extrabold tracking-tight text-white">TapRide</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (onShowToast) {
+                      onShowToast('No new notifications at this time.', 'info');
+                    }
+                  }}
+                  className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/10 transition-colors"
+                  title="Notifications"
+                >
+                  <Bell className="w-4 h-4" />
+                </button>
             <button
               onClick={onOpenProfile}
               className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/10 transition-colors"
@@ -168,7 +229,10 @@ export const WalletHomeMobile: React.FC<WalletHomeMobileProps> = ({
 
             {/* Travel */}
             <button
-              onClick={onNavigateToBooking}
+              onClick={() => {
+                setActiveBottomNav('travel');
+                if (onNavigateToBooking) onNavigateToBooking();
+              }}
               className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200/80 hover:border-blue-300 hover:shadow-md transition-all group"
             >
               <div className="w-11 h-11 rounded-xl bg-blue-50 group-hover:bg-blue-600 flex items-center justify-center text-blue-600 group-hover:text-white transition-colors mb-2">
@@ -308,6 +372,8 @@ export const WalletHomeMobile: React.FC<WalletHomeMobileProps> = ({
           </div>
         </div>
       </div>
+      </>
+      )}
 
       {/* 4. Bottom Sticky Navigation Bar */}
       <div className="fixed bottom-0 max-w-md w-full bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-6 flex justify-around items-center z-30 shadow-lg">
@@ -328,7 +394,7 @@ export const WalletHomeMobile: React.FC<WalletHomeMobileProps> = ({
         <button
           onClick={() => {
             setActiveBottomNav('travel');
-            onNavigateToBooking();
+            if (onNavigateToBooking) onNavigateToBooking();
           }}
           className={`flex flex-col items-center gap-1 transition-colors ${
             activeBottomNav === 'travel' ? 'text-blue-600 font-extrabold' : 'text-slate-400 font-medium'

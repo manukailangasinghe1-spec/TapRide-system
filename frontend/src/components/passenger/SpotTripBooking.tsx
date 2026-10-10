@@ -32,7 +32,7 @@ export const SpotTripBooking: React.FC<SpotTripBookingProps> = ({
   onToggleSeat,
   onConfirmBooking,
 }) => {
-  const [serverDate] = useState('2026-08-12');
+  const [serverDate] = useState(() => new Date().toISOString().split('T')[0]);
 
   const selectedSeats = seats.filter((s) => s.status === 'selected');
   const totalFare = selectedSeats.length * selectedRoute.baseFare;

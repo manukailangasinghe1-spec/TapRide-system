@@ -1,5 +1,14 @@
 import type { BusRoute, PassengerProfile, Seat, Transaction } from '../types/passenger';
 
+// Dynamic dates helper
+const now = new Date();
+const formatDate = (d: Date) => d.toISOString().split('T')[0];
+const formatShortDate = (d: Date) =>
+  d.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+
+const todayStr = formatDate(now);
+const futureExpiryStr = formatDate(new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000));
+
 export const initialPassengerProfile: PassengerProfile = {
   name: 'Kasun Perera',
   username: 'Your Username',
@@ -9,7 +18,7 @@ export const initialPassengerProfile: PassengerProfile = {
   balance: 2450.0,
   isPassHolder: true,
   passType: '30-Day Monthly Season Pass',
-  passExpiry: '2026-08-31',
+  passExpiry: futureExpiryStr,
   monthlySpent: 3150,
   monthlyTarget: 5000,
   monthlyTrips: 28,
@@ -23,7 +32,7 @@ export const sampleRoutes: BusRoute[] = [
     busNumber: 'ND-4492',
     from: 'Anuradhapura Main Stand',
     to: 'Polonnaruwa Town Terminal',
-    date: '2026-08-13',
+    date: todayStr,
     departureTime: '06:00 AM',
     arrivalTime: '08:45 AM',
     baseFare: 150.0,
@@ -36,7 +45,7 @@ export const sampleRoutes: BusRoute[] = [
     busNumber: 'WP-8812',
     from: 'Colombo Fort Central',
     to: 'Kandy Goods Shed',
-    date: '2026-08-13',
+    date: todayStr,
     departureTime: '07:15 AM',
     arrivalTime: '10:00 AM',
     baseFare: 420.0,
@@ -49,7 +58,7 @@ export const sampleRoutes: BusRoute[] = [
     busNumber: 'SP-1903',
     from: 'Galle Bus Stand',
     to: 'Matara Main Station',
-    date: '2026-08-13',
+    date: todayStr,
     departureTime: '08:30 AM',
     arrivalTime: '09:20 AM',
     baseFare: 110.0,
@@ -62,8 +71,8 @@ export const initialTransactions: Transaction[] = [
     id: 'tx-1',
     type: 'fare',
     title: 'Bus Fare',
-    subtitle: 'Today · 08:42 AM',
-    timestamp: '2026-08-12 08:42 AM',
+    subtitle: `Today · 08:42 AM`,
+    timestamp: `${todayStr} 08:42 AM`,
     amount: 85.0,
     isDebit: true,
     reference: 'TR-782190',
@@ -73,8 +82,8 @@ export const initialTransactions: Transaction[] = [
     id: 'tx-2',
     type: 'fare',
     title: 'Bus Fare',
-    subtitle: 'Yesterday · 04:26 PM',
-    timestamp: '2026-08-11 04:26 PM',
+    subtitle: `Yesterday · 04:26 PM`,
+    timestamp: `${formatDate(new Date(now.getTime() - 86400000))} 04:26 PM`,
     amount: 120.0,
     isDebit: true,
     reference: 'TR-781042',
@@ -84,8 +93,8 @@ export const initialTransactions: Transaction[] = [
     id: 'tx-3',
     type: 'topup',
     title: 'Wallet Top-up',
-    subtitle: '10 Aug · 11:15 AM',
-    timestamp: '2026-08-10 11:15 AM',
+    subtitle: `${formatShortDate(new Date(now.getTime() - 2 * 86400000))} · 11:15 AM`,
+    timestamp: `${formatDate(new Date(now.getTime() - 2 * 86400000))} 11:15 AM`,
     amount: 1000.0,
     isDebit: false,
     reference: 'PAY-904128',
@@ -95,8 +104,8 @@ export const initialTransactions: Transaction[] = [
     id: 'tx-4',
     type: 'fare',
     title: 'Bus Fare',
-    subtitle: '09 Aug · 07:45 AM',
-    timestamp: '2026-08-09 07:45 AM',
+    subtitle: `${formatShortDate(new Date(now.getTime() - 3 * 86400000))} · 07:45 AM`,
+    timestamp: `${formatDate(new Date(now.getTime() - 3 * 86400000))} 07:45 AM`,
     amount: 85.0,
     isDebit: true,
     reference: 'TR-779810',
@@ -106,8 +115,8 @@ export const initialTransactions: Transaction[] = [
     id: 'tx-5',
     type: 'fare',
     title: 'Express Highway Fare',
-    subtitle: '08 Aug · 06:10 PM',
-    timestamp: '2026-08-08 06:10 PM',
+    subtitle: `${formatShortDate(new Date(now.getTime() - 4 * 86400000))} · 06:10 PM`,
+    timestamp: `${formatDate(new Date(now.getTime() - 4 * 86400000))} 06:10 PM`,
     amount: 250.0,
     isDebit: true,
     reference: 'TR-776492',
@@ -117,8 +126,8 @@ export const initialTransactions: Transaction[] = [
     id: 'tx-6',
     type: 'topup',
     title: 'Commercial Bank Direct Pay',
-    subtitle: '05 Aug · 02:30 PM',
-    timestamp: '2026-08-05 02:30 PM',
+    subtitle: `${formatShortDate(new Date(now.getTime() - 7 * 86400000))} · 02:30 PM`,
+    timestamp: `${formatDate(new Date(now.getTime() - 7 * 86400000))} 02:30 PM`,
     amount: 2000.0,
     isDebit: false,
     reference: 'COMB-39182',

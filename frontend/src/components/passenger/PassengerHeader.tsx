@@ -1,5 +1,5 @@
-import React from 'react';
-import { User, Smartphone, Monitor } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Smartphone, Monitor, Menu, X } from 'lucide-react';
 import type { PassengerProfile, TabType } from '../../types/passenger';
 
 interface PassengerHeaderProps {
@@ -19,6 +19,7 @@ export const PassengerHeader: React.FC<PassengerHeaderProps> = ({
   onToggleViewMode,
   onOpenSeasonPassModal,
 }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -129,8 +130,77 @@ export const PassengerHeader: React.FC<PassengerHeaderProps> = ({
                 <User className="w-4 h-4" />
               </div>
             </div>
+
+            {/* Mobile / Tablet Menu Button (< lg) */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              aria-label="Toggle navigation menu"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5 text-slate-900" /> : <Menu className="w-5 h-5 text-slate-700" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile / Tablet Dropdown Navigation Menu (< lg) */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden border-t border-slate-200 py-3 px-2 space-y-1 bg-white animate-in slide-in-from-top-2 duration-150">
+            <button
+              onClick={() => {
+                onTabChange('booking');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeTab === 'booking'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              Spot Trip Booking
+            </button>
+            <button
+              onClick={() => {
+                onTabChange('pass');
+                onOpenSeasonPassModal();
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeTab === 'pass'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              Monthly Season Pass
+            </button>
+            <button
+              onClick={() => {
+                onTabChange('wallet');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition-all ${
+                activeTab === 'wallet'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <span>My Pass Wallet</span>
+              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+            </button>
+            <button
+              onClick={() => {
+                onTabChange('fleet');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeTab === 'fleet'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              Fleet Seat Map
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );
