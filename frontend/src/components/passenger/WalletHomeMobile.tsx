@@ -104,16 +104,14 @@ export const WalletHomeMobile: React.FC<WalletHomeMobileProps> = ({
         <>
           {/* 1. Curved Royal Blue Header & Hero */}
           <div className="relative bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-800 text-white pt-6 pb-24 px-5 rounded-b-[2.5rem] shadow-lg overflow-hidden">
-            {/* Subtle decorative curved circular glow */}
-            <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-blue-400/20 blur-2xl pointer-events-none"></div>
-            <div className="absolute -left-12 top-24 w-40 h-40 rounded-full bg-indigo-500/20 blur-xl pointer-events-none"></div>
-
             {/* Top Brand & Actions Bar */}
             <div className="relative flex items-center justify-between mb-6">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black text-lg border border-white/20 shadow-xs">
-                  T
-                </div>
+                <img
+                  src="/logo.jpeg"
+                  alt="TapRide logo"
+                  className="w-9 h-9 rounded-xl object-cover border border-white/20 shadow-sm"
+                />
                 <span className="text-xl font-extrabold tracking-tight text-white">TapRide</span>
               </div>
 

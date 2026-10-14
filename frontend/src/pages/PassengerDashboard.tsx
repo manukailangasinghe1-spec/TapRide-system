@@ -46,33 +46,23 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
 
-  // Automatic Mobile View: default to mobile on < 768px screens
+  // Automatic mobile view: responds to screen width without a manual preview toggle.
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       return 'mobile';
     }
     return 'desktop';
   });
-  const [hasManuallyToggled, setHasManuallyToggled] = useState<boolean>(false);
 
   useEffect(() => {
     const handleResize = () => {
-      const isMobile = window.innerWidth < 768;
-      if (isMobile) {
-        setViewMode('mobile');
-      } else if (!hasManuallyToggled) {
-        setViewMode('desktop');
-      }
+      setViewMode(window.innerWidth < 768 ? 'mobile' : 'desktop');
     };
+
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [hasManuallyToggled]);
-
-  const handleToggleViewMode = () => {
-    setHasManuallyToggled(true);
-    setViewMode((prev) => (prev === 'desktop' ? 'mobile' : 'desktop'));
-  };
+  }, []);
 
   // Toast notification state
   const [toast, setToast] = useState<{
@@ -240,6 +230,7 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
       status: 'completed',
     };
     setTransactions((prev) => [newTx, ...prev]);
+    showToast(`Rs. ${amount.toFixed(2)} added to your TapRide wallet successfully.`, 'success');
   };
 
   // Handle send money success
@@ -261,6 +252,7 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
       status: 'completed',
     };
     setTransactions((prev) => [newTx, ...prev]);
+    showToast(`Transfer of Rs. ${amount.toFixed(2)} to ${recipient} was successful.`, 'success');
   };
 
   return (
@@ -270,8 +262,6 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
         activeTab={activeTab}
         onTabChange={(tab) => setActiveTab(tab)}
         profile={profile}
-        viewMode={viewMode}
-        onToggleViewMode={handleToggleViewMode}
         onOpenSeasonPassModal={() => setIsSeasonPassModalOpen(true)}
       />
 

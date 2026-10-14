@@ -11,7 +11,7 @@ const futureExpiryStr = formatDate(new Date(now.getTime() + 30 * 24 * 60 * 60 * 
 
 export const initialPassengerProfile: PassengerProfile = {
   name: 'Kasun Perera',
-  username: 'Your Username',
+  username: '@kasun.perera',
   email: 'kasun.perera@tapride.lk',
   phone: '+94 77 123 4567',
   walletNumber: '•••• 4827',

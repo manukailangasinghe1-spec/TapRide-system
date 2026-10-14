@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { User, Smartphone, Monitor, Menu, X } from 'lucide-react';
+import { User, Menu, X } from 'lucide-react';
 import type { PassengerProfile, TabType } from '../../types/passenger';
 
 interface PassengerHeaderProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   profile: PassengerProfile;
-  viewMode: 'desktop' | 'mobile';
-  onToggleViewMode: () => void;
   onOpenSeasonPassModal: () => void;
 }
 
@@ -15,8 +13,6 @@ export const PassengerHeader: React.FC<PassengerHeaderProps> = ({
   activeTab,
   onTabChange,
   profile,
-  viewMode,
-  onToggleViewMode,
   onOpenSeasonPassModal,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -28,9 +24,11 @@ export const PassengerHeader: React.FC<PassengerHeaderProps> = ({
           <div className="flex items-center gap-6">
             {/* Logo and Console branding */}
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-extrabold text-lg shadow-sm">
-                T
-              </div>
+              <img
+                src="/logo.jpeg"
+                alt="TapRide logo"
+                className="w-9 h-9 rounded-xl object-cover border border-blue-200 shadow-sm"
+              />
               <div className="leading-tight">
                 <div className="flex items-center gap-2">
                   <span className="text-base font-extrabold text-slate-900 tracking-tight">TapRide</span>
@@ -98,29 +96,10 @@ export const PassengerHeader: React.FC<PassengerHeaderProps> = ({
 
           {/* Right User info & Preview Switcher */}
           <div className="flex items-center gap-4">
-            {/* View Mode Toggle Button */}
-            <button
-              onClick={onToggleViewMode}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors"
-              title="Toggle view between Desktop PC Console and Mobile Wallet Home"
-            >
-              {viewMode === 'desktop' ? (
-                <>
-                  <Smartphone className="w-3.5 h-3.5 text-blue-600" />
-                  <span className="hidden sm:inline">Mobile Wallet View</span>
-                </>
-              ) : (
-                <>
-                  <Monitor className="w-3.5 h-3.5 text-blue-600" />
-                  <span className="hidden sm:inline">PC Console View</span>
-                </>
-              )}
-            </button>
-
             {/* Profile pill */}
             <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200">
               <div className="text-right hidden sm:block">
-                <div className="text-xs font-bold text-slate-900 leading-none">{profile.username}</div>
+                <div className="text-xs font-bold text-slate-900 leading-none">{profile.username || profile.name}</div>
                 <div className="flex items-center justify-end gap-1 text-[11px] text-slate-500 font-medium mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                   Active Pass Holder
