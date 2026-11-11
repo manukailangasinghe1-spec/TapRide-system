@@ -36,7 +36,11 @@ export const ToastNotification: React.FC<ToastProps> = ({
   }[type];
 
   return (
-    <div className="fixed top-5 right-5 z-50 max-w-sm w-full mx-auto px-4 pointer-events-auto transition-all animate-in fade-in slide-in-from-top-4 duration-200">
+    <div
+      role="status"
+      aria-live="polite"
+      className="fixed z-50 top-4 left-4 right-4 sm:left-auto sm:right-5 sm:top-5 sm:w-full sm:max-w-sm pointer-events-auto transition-all animate-in fade-in slide-in-from-top-4 duration-200"
+    >
       <div
         className={`flex items-start gap-3 p-4 rounded-2xl border shadow-2xl backdrop-blur-md ${bgStyles}`}
       >

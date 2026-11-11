@@ -21,6 +21,18 @@ export const SendMoneyModal: React.FC<SendMoneyModalProps> = ({
 
   if (!isOpen) return null;
 
+  const resetForm = () => {
+    setRecipient('');
+    setAmount('');
+    setError('');
+    setIsSending(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -41,8 +53,8 @@ export const SendMoneyModal: React.FC<SendMoneyModalProps> = ({
 
     setIsSending(true);
     setTimeout(() => {
-      setIsSending(false);
       onSendSuccess(parsedAmount, recipient);
+      resetForm();
       onClose();
     }, 700);
   };
@@ -62,7 +74,7 @@ export const SendMoneyModal: React.FC<SendMoneyModalProps> = ({
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="p-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
           >
             <X className="w-5 h-5" />

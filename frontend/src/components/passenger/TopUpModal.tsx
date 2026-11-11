@@ -14,7 +14,7 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
 }) => {
   const [selectedAmount, setSelectedAmount] = useState<number>(1000);
   const [customAmount, setCustomAmount] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank' | 'frimi'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank'>('card');
   const [isProcessing, setIsProcessing] = useState(false);
 
   if (!isOpen) return null;
@@ -27,11 +27,14 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
   };
 
   const handleCustomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomAmount(e.target.value);
-    const parsed = parseFloat(e.target.value);
-    if (!isNaN(parsed) && parsed > 0) {
-      setSelectedAmount(parsed);
+    const value = e.target.value;
+    setCustomAmount(value);
+    if (value.trim() === '') {
+      setSelectedAmount(presetAmounts[0]);
+      return;
     }
+    const parsed = parseFloat(value);
+    setSelectedAmount(Number.isFinite(parsed) && parsed > 0 ? parsed : 0);
   };
 
   const handleConfirm = () => {
@@ -41,12 +44,7 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
     setIsProcessing(true);
     setTimeout(() => {
       setIsProcessing(false);
-      const methodLabel =
-        paymentMethod === 'card'
-          ? 'Visa / Mastercard'
-          : paymentMethod === 'bank'
-          ? 'Direct Bank Pay'
-          : 'FriMi / Mobile Wallet';
+      const methodLabel = paymentMethod === 'card' ? 'Visa / Mastercard' : 'Direct Bank Pay';
       onTopUpSuccess(finalAmount, methodLabel);
       onClose();
     }, 800);
@@ -110,6 +108,8 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
               <span className="absolute left-3.5 top-2.5 text-xs font-bold text-slate-400">Rs.</span>
               <input
                 type="number"
+                min={1}
+                inputMode="decimal"
                 placeholder="e.g. 1500"
                 value={customAmount}
                 onChange={handleCustomChange}
@@ -163,7 +163,7 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
 
           <button
             onClick={handleConfirm}
-            disabled={isProcessing}
+            disabled={isProcessing || selectedAmount <= 0}
             className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold rounded-xl text-sm shadow-lg shadow-blue-500/25 transition-all"
           >
             {isProcessing ? 'Processing Recharge...' : `Recharge Rs. ${selectedAmount.toLocaleString()}`}

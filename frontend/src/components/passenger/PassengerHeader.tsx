@@ -77,7 +77,6 @@ export const PassengerHeader: React.FC<PassengerHeaderProps> = ({
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
                 My Pass Wallet
               </button>
 
@@ -94,7 +93,7 @@ export const PassengerHeader: React.FC<PassengerHeaderProps> = ({
             </nav>
           </div>
 
-          {/* Right User info & Preview Switcher */}
+          {/* Right User info */}
           <div className="flex items-center gap-4">
             {/* Profile pill */}
             <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200">
@@ -163,7 +162,6 @@ export const PassengerHeader: React.FC<PassengerHeaderProps> = ({
               }`}
             >
               <span>My Pass Wallet</span>
-              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
             </button>
             <button
               onClick={() => {

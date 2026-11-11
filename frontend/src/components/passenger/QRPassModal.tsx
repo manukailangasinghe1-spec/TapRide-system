@@ -16,6 +16,38 @@ export const QRPassModal: React.FC<QRPassModalProps> = ({
 }) => {
   if (!isOpen || !ticket) return null;
 
+  const handleSavePass = () => {
+    const receipt = [
+      'TapRide Boarding Pass',
+      '=====================',
+      `Booking Reference : ${ticket.bookingReference}`,
+      `Passenger         : ${ticket.passengerName}`,
+      `Bus               : ${ticket.busName} (${ticket.busNumber})`,
+      `Route             : ${ticket.route}`,
+      `Travel Date       : ${ticket.travelDate}`,
+      `Departure         : ${ticket.departureTime}`,
+      `Seats             : ${ticket.seatNumbers.join(', ')}`,
+      `Total Fare        : Rs. ${ticket.totalFare.toFixed(2)}`,
+      `Issued At         : ${ticket.issuedAt}`,
+      `QR Payload        : ${ticket.qrPayload}`,
+    ].join('\n');
+
+    const blob = new Blob([receipt], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `TapRide-Pass-${ticket.bookingReference}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    // Defer revoke so the browser can start reading the blob before it is released.
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    if (onShowToast) {
+      onShowToast(`Boarding pass #${ticket.bookingReference} downloaded.`, 'success');
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden transform transition-all scale-100">
@@ -109,7 +141,7 @@ export const QRPassModal: React.FC<QRPassModalProps> = ({
                   <div className="text-xs text-slate-600 font-medium">{ticket.route}</div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+                  <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200 whitespace-nowrap">
                     {ticket.busNumber}
                   </span>
                 </div>
@@ -134,7 +166,7 @@ export const QRPassModal: React.FC<QRPassModalProps> = ({
             <div className="flex items-center justify-between p-3 bg-blue-50/60 rounded-xl border border-blue-100">
               <div>
                 <span className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider block">Allocated Seats</span>
-                <div className="flex gap-1.5 mt-1">
+                <div className="flex flex-wrap gap-1.5 mt-1 max-w-[200px]">
                   {ticket.seatNumbers.map((seat) => (
                     <span key={seat} className="px-2.5 py-1 bg-emerald-600 text-white font-extrabold text-xs rounded-md shadow-sm">
                       {seat}
@@ -152,18 +184,14 @@ export const QRPassModal: React.FC<QRPassModalProps> = ({
           {/* Action Buttons */}
           <div className="mt-5 grid grid-cols-2 gap-3">
             <button
-              onClick={() => {
-                if (onShowToast) {
-                  onShowToast(`Boarding Pass #${ticket.bookingReference} downloaded as PDF.`, 'success');
-                }
-              }}
-              className="flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-colors"
+              onClick={handleSavePass}
+              className="flex items-center justify-center gap-2 py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-[11px] whitespace-nowrap transition-colors"
             >
               <Download className="w-4 h-4" /> Save Pass
             </button>
             <button
               onClick={onClose}
-              className="flex items-center justify-center gap-2 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs shadow-md shadow-blue-500/20 transition-colors"
+              className="flex items-center justify-center gap-2 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-[11px] whitespace-nowrap shadow-md shadow-blue-500/20 transition-colors"
             >
               <CheckCircle className="w-4 h-4" /> Ready to Travel
             </button>

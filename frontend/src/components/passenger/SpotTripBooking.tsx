@@ -10,6 +10,7 @@ import {
   Armchair
 } from 'lucide-react';
 import type { BusRoute, Seat } from '../../types/passenger';
+import { toLocalISODate } from '../../utils/date';
 
 interface SpotTripBookingProps {
   routes: BusRoute[];
@@ -32,7 +33,7 @@ export const SpotTripBooking: React.FC<SpotTripBookingProps> = ({
   onToggleSeat,
   onConfirmBooking,
 }) => {
-  const [serverDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [today] = useState(() => toLocalISODate());
 
   const selectedSeats = seats.filter((s) => s.status === 'selected');
   const totalFare = selectedSeats.length * selectedRoute.baseFare;
@@ -73,7 +74,7 @@ export const SpotTripBooking: React.FC<SpotTripBookingProps> = ({
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               CURRENT SERVER DATE
             </div>
-            <div className="text-sm font-mono font-bold text-slate-800">{serverDate}</div>
+            <div className="text-sm font-mono font-bold text-slate-800">{today}</div>
           </div>
         </div>
       </div>
@@ -114,7 +115,7 @@ export const SpotTripBooking: React.FC<SpotTripBookingProps> = ({
           <div className="relative">
             <input
               type="date"
-              min={new Date().toISOString().split('T')[0]}
+              min={today}
               value={travelDate}
               onChange={(e) => onTravelDateChange(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -189,11 +190,8 @@ export const SpotTripBooking: React.FC<SpotTripBookingProps> = ({
                 <span>ENTRANCE DOOR</span>
               </div>
 
-              <div className="px-4 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 font-extrabold text-xs tracking-wider flex items-center gap-2 shadow-sm">
+              <div className="px-4 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 font-extrabold text-xs tracking-wider shadow-sm">
                 <span>DRIVER CABIN</span>
-                <div className="w-5 h-5 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-[10px]">
-                  ✇
-                </div>
               </div>
             </div>
 
@@ -206,13 +204,6 @@ export const SpotTripBooking: React.FC<SpotTripBookingProps> = ({
                     {left.map((seat) => (
                       <SeatButton key={seat.id} seat={seat} onToggle={() => onToggleSeat(seat.id)} />
                     ))}
-                  </div>
-
-                  {/* Aisle space */}
-                  <div className="flex-1 flex items-center justify-center">
-                    <span className="text-[10px] font-mono text-slate-300 select-none">
-                      •
-                    </span>
                   </div>
 
                   {/* Right trio (3 seats) */}
@@ -365,6 +356,8 @@ const SeatButton: React.FC<SeatButtonProps> = ({ seat, onToggle }) => {
     return (
       <button
         onClick={onToggle}
+        aria-pressed="true"
+        aria-label={`Seat ${seat.id} selected, click to remove`}
         className="w-12 h-11 rounded-lg border-2 border-emerald-600 bg-emerald-500 text-white flex flex-col items-center justify-center text-[10px] shadow-md shadow-emerald-500/30 scale-105 transition-transform"
         title={`Seat ${seat.id}: Selected (Click to remove)`}
       >
@@ -378,6 +371,8 @@ const SeatButton: React.FC<SeatButtonProps> = ({ seat, onToggle }) => {
   return (
     <button
       onClick={onToggle}
+      aria-pressed="false"
+      aria-label={`Seat ${seat.id} available, click to select`}
       className="w-12 h-11 rounded-lg border-2 border-slate-300 bg-white hover:border-blue-500 hover:bg-blue-50/40 text-slate-800 flex flex-col items-center justify-center text-[10px] transition-all hover:scale-105 shadow-xs"
       title={`Seat ${seat.id}: Available (Click to select)`}
     >

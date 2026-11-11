@@ -28,11 +28,10 @@ import {
   Send,
   Bus,
   ArrowUpRight,
-  Moon,
-  Sun,
   MessageCircle,
   Sparkles,
 } from 'lucide-react';
+import { toLocalISODate } from '../utils/date';
 
 interface PassengerDashboardProps {
   initialTab?: TabType;
@@ -80,7 +79,7 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
   // Booking state with dynamic initial date
   const [routes] = useState<BusRoute[]>(sampleRoutes);
   const [selectedRoute, setSelectedRoute] = useState<BusRoute>(sampleRoutes[0]);
-  const [travelDate, setTravelDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
+  const [travelDate, setTravelDate] = useState<string>(() => toLocalISODate());
   const [seats, setSeats] = useState<Seat[]>(() => generateInitialSeats(sampleRoutes[0].baseFare));
 
   // Generated Ticket Pass
@@ -93,9 +92,6 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
   const [isSendMoneyModalOpen, setIsSendMoneyModalOpen] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isSeasonPassModalOpen, setIsSeasonPassModalOpen] = useState(false);
-
-  // Dark mode simulation state
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Toggle seat selection
   const handleToggleSeat = (seatId: string) => {
@@ -124,6 +120,11 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
   const handleConfirmBooking = () => {
     const selectedSeats = seats.filter((s) => s.status === 'selected');
     if (selectedSeats.length === 0) return;
+
+    if (travelDate < toLocalISODate()) {
+      showToast('Travel date cannot be in the past. Please choose today or a future date.', 'error');
+      return;
+    }
 
     const totalFare = selectedSeats.length * selectedRoute.baseFare;
 
@@ -189,10 +190,18 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
   };
 
   // Handle successful Scan QR tap
-  const handleSuccessfulScan = (amount: number, description: string) => {
+  const handleSuccessfulScan = (amount: number, description: string): boolean => {
+    if (profile.balance < amount) {
+      showToast(
+        `Insufficient balance. Your wallet has Rs. ${profile.balance.toFixed(2)}, but this fare is Rs. ${amount.toFixed(2)}. Please top up.`,
+        'error'
+      );
+      return false;
+    }
+
     setProfile((prev) => ({
       ...prev,
-      balance: Math.max(0, prev.balance - amount),
+      balance: prev.balance - amount,
       monthlySpent: prev.monthlySpent + amount,
       monthlyTrips: prev.monthlyTrips + 1,
     }));
@@ -209,6 +218,7 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
       status: 'completed',
     };
     setTransactions((prev) => [newTx, ...prev]);
+    return true;
   };
 
   // Handle successful top up
@@ -256,49 +266,39 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-[#f8fafc] text-slate-900'} font-sans antialiased`}>
-      {/* 1. Header (Desktop View) */}
-      <PassengerHeader
-        activeTab={activeTab}
-        onTabChange={(tab) => setActiveTab(tab)}
-        profile={profile}
-        onOpenSeasonPassModal={() => setIsSeasonPassModalOpen(true)}
-      />
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased">
+      {/* Desktop header (mobile layout has its own app header) */}
+      {viewMode === 'desktop' && (
+        <PassengerHeader
+          activeTab={activeTab}
+          onTabChange={(tab) => setActiveTab(tab)}
+          profile={profile}
+          onOpenSeasonPassModal={() => setIsSeasonPassModalOpen(true)}
+        />
+      )}
 
-      {/* 2. Main Body Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* If Mobile View mode is toggled, render the mobile frame matching Figma Image 1 */}
-        {viewMode === 'mobile' ? (
-          <div className="flex flex-col items-center">
-            <div className="mb-4 text-center">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
-                Mobile Preview: Passenger Wallet Home
-              </span>
-            </div>
-            <WalletHomeMobile
-              profile={profile}
-              transactions={transactions}
-              onOpenScanQR={() => setIsScanQRModalOpen(true)}
-              onOpenTopUp={() => setIsTopUpModalOpen(true)}
-              onOpenSend={() => setIsSendMoneyModalOpen(true)}
-              onOpenHelp={() => setIsHelpModalOpen(true)}
-              onNavigateToBooking={() => {
-                setActiveTab('booking');
-              }}
-              onOpenProfile={() => setIsSeasonPassModalOpen(true)}
-              routes={routes}
-              selectedRoute={selectedRoute}
-              onSelectRoute={handleSelectRoute}
-              travelDate={travelDate}
-              onTravelDateChange={setTravelDate}
-              seats={seats}
-              onToggleSeat={handleToggleSeat}
-              onConfirmBooking={handleConfirmBooking}
-              onShowToast={showToast}
-            />
-          </div>
-        ) : (
-          /* Desktop Console View matching Figma Image 2 */
+      {viewMode === 'mobile' ? (
+        <WalletHomeMobile
+          profile={profile}
+          transactions={transactions}
+          onOpenScanQR={() => setIsScanQRModalOpen(true)}
+          onOpenTopUp={() => setIsTopUpModalOpen(true)}
+          onOpenSend={() => setIsSendMoneyModalOpen(true)}
+          onOpenHelp={() => setIsHelpModalOpen(true)}
+          onOpenPass={() => setIsSeasonPassModalOpen(true)}
+          routes={routes}
+          selectedRoute={selectedRoute}
+          onSelectRoute={handleSelectRoute}
+          travelDate={travelDate}
+          onTravelDateChange={setTravelDate}
+          seats={seats}
+          onToggleSeat={handleToggleSeat}
+          onConfirmBooking={handleConfirmBooking}
+          onShowToast={showToast}
+        />
+      ) : (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Desktop Console View matching Figma Image 2 */}
           <div>
             {/* Tab: Spot Trip Booking */}
             {activeTab === 'booking' && (
@@ -506,27 +506,20 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
               </div>
             )}
           </div>
-        )}
-      </main>
+        </main>
+      )}
 
-      {/* Floating Action Controls on bottom-right (Theme Toggle & Chat Bubble) matching Figma PC */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
-        <button
-          onClick={() => setIsDarkMode(!isDarkMode)}
-          className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg flex items-center justify-center text-slate-700 dark:text-slate-200 hover:scale-105 transition-transform"
-          title="Toggle Light / Dark theme"
-        >
-          {isDarkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-700" />}
-        </button>
-
+      {/* Desktop-only passenger support chat */}
+      {viewMode === 'desktop' && (
         <button
           onClick={() => setIsHelpModalOpen(true)}
-          className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+          className="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
           title="Passenger Support Chat"
+          aria-label="Open passenger support"
         >
           <MessageCircle className="w-6 h-6" />
         </button>
-      </div>
+      )}
 
       {/* Interactive Modals */}
       <QRPassModal
@@ -577,7 +570,7 @@ export const PassengerDashboard: React.FC<PassengerDashboardProps> = ({
             seatNumbers: ['A01-A30'],
             totalFare: 0,
             qrPayload: `SEASON_PASS:${profile.name}:PRIORITY_A01_A30`,
-            issuedAt: new Date().toISOString().split('T')[0],
+            issuedAt: toLocalISODate(),
           });
           setIsQRPassModalOpen(true);
         }}

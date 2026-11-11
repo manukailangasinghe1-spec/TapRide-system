@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { X, QrCode, CheckCircle2, ShieldCheck, Bus, Zap } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { X, QrCode, CheckCircle2, ShieldCheck, Bus, Zap, AlertCircle } from 'lucide-react';
 
 interface ScanQRModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccessfulScan: (amount: number, description: string) => void;
+  onSuccessfulScan: (amount: number, description: string) => boolean;
 }
+
+const SCAN_FARE = 85.0;
 
 export const ScanQRModal: React.FC<ScanQRModalProps> = ({
   isOpen,
@@ -14,16 +16,35 @@ export const ScanQRModal: React.FC<ScanQRModalProps> = ({
 }) => {
   const [scanning, setScanning] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
+  const scanTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const errorTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   if (!isOpen) return null;
 
+  const clearTimers = () => {
+    if (scanTimer.current) clearTimeout(scanTimer.current);
+    if (errorTimer.current) clearTimeout(errorTimer.current);
+    if (successTimer.current) clearTimeout(successTimer.current);
+    scanTimer.current = null;
+    errorTimer.current = null;
+    successTimer.current = null;
+  };
+
   const handleSimulateScan = () => {
     setScanning(true);
-    setTimeout(() => {
+    setError(false);
+    scanTimer.current = setTimeout(() => {
       setScanning(false);
+      const accepted = onSuccessfulScan(SCAN_FARE, 'Bus Fare - Anuradhapura Transit');
+      if (!accepted) {
+        setError(true);
+        errorTimer.current = setTimeout(() => setError(false), 2500);
+        return;
+      }
       setSuccess(true);
-      onSuccessfulScan(85.0, 'Bus Fare - Anuradhapura Transit');
-      setTimeout(() => {
+      successTimer.current = setTimeout(() => {
         setSuccess(false);
         onClose();
       }, 1500);
@@ -31,8 +52,10 @@ export const ScanQRModal: React.FC<ScanQRModalProps> = ({
   };
 
   const handleClose = () => {
+    clearTimers();
     setScanning(false);
     setSuccess(false);
+    setError(false);
     onClose();
   };
 
@@ -74,11 +97,19 @@ export const ScanQRModal: React.FC<ScanQRModalProps> = ({
               <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] animate-bounce"></div>
             )}
 
-            {success ? (
+            {error ? (
+              <div className="flex flex-col items-center justify-center text-rose-300 p-4 animate-in zoom-in-75 duration-200">
+                <AlertCircle className="w-12 h-12 mb-2" />
+                <span className="font-extrabold text-sm text-white text-center">Insufficient Balance</span>
+                <span className="text-[11px] text-rose-300 font-medium mt-1 text-center">
+                  Please top up your wallet and try again.
+                </span>
+              </div>
+            ) : success ? (
               <div className="flex flex-col items-center justify-center text-emerald-400 p-4 animate-in zoom-in-75 duration-200">
                 <CheckCircle2 className="w-16 h-16 mb-2 drop-shadow" />
                 <span className="font-extrabold text-base text-white">Tapped In Successfully!</span>
-                <span className="text-xs text-emerald-400 font-mono mt-1">- Rs. 85.00 Deducted</span>
+                <span className="text-xs text-emerald-400 font-mono mt-1">- Rs. {SCAN_FARE.toFixed(2)} Deducted</span>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center text-white/70 p-4">
