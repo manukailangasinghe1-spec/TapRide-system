@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AdminLayout } from './components/admin/AdminLayout'
 import LandingPage from './pages/LandingPage'
 import AuthPortal from './pages/AuthPortal'
+import JourneyHistoryPage from './pages/JourneyHistoryPage'
 import PassengerDashboard from './pages/PassengerDashboard'
 import AdminSettingsPage from './pages/AdminSettingsPage'
 import AdminModulePlaceholder from './pages/AdminModulePlaceholder'
@@ -20,6 +21,7 @@ const App: React.FC = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<AuthPortal />} />
         <Route path="/register" element={<AuthPortal />} />
+        <Route path="/journey-history" element={<JourneyHistoryPage />} />
         <Route path="/passenger" element={<PassengerDashboard />} />
         <Route path="/passenger/wallet" element={<PassengerDashboard initialTab="wallet" />} />
         <Route path="/passenger/booking" element={<PassengerDashboard initialTab="booking" />} />
