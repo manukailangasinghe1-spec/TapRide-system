@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AdminLayout } from './components/admin/AdminLayout'
 import LandingPage from './pages/LandingPage'
 import AuthPortal from './pages/AuthPortal'
@@ -12,6 +12,8 @@ import SettlementSummary from './pages/SettlementSummary'
 import AdminReportsManagement from './pages/AdminReportsManagement'
 import OfflineSync from './pages/OfflineSync'
 import ConductorPlaceholder from './pages/ConductorPlaceholder'
+import OwnerDashboard from './pages/OwnerDashboard'
+import OwnerModulePlaceholder from './pages/OwnerModulePlaceholder'
 
 const App: React.FC = () => {
   return (
@@ -29,7 +31,11 @@ const App: React.FC = () => {
         <Route path="/conductor/sync" element={<OfflineSync />} />
         <Route path="/conductor/dashboard" element={<ConductorPlaceholder title="Dashboard" />} />
         <Route path="/conductor/profile" element={<ConductorPlaceholder title="Profile" />} />
+        <Route path="/owner" element={<Navigate to="/owner/dashboard" replace />} />
+        <Route path="/owner/dashboard" element={<OwnerDashboard />} />
         <Route path="/owner/settlements" element={<SettlementSummary />} />
+        <Route path="/owner/:module" element={<OwnerModulePlaceholder />} />
+        <Route path="/operator" element={<Navigate to="/owner/dashboard" replace />} />
         <Route path="/settlements" element={<SettlementSummary />} />
         <Route path="/admin/reports" element={<AdminReportsManagement />} />
         <Route path="/admin/management" element={<AdminReportsManagement />} />
